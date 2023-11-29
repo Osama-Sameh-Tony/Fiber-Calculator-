@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cable Color Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(45deg, #7bdff2, #b2f7ef, #a6f1e0, #63a4ff, #7bdff2);
+      background-size: 400% 400%;
+      animation: gradientBackground 10s ease infinite;
+    }
+
+    @keyframes gradientBackground {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    #calculator {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    input {
+      width: calc(100% - 16px);
+      padding: 8px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #output {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #333;
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    #madeBy {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #555;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+  <script>
+    function getColor(order) {
+      const listColors = ["ازرق", "برتقاني", "اخضر", "بني", "رمادي", "ابيض", "احمر", "اسود", "اصفر", "بنفسجي", "بمبي", "لبني"];
+      return listColors[order - 1];
+    }
+
+    function calculateColor() {
+      const cableType = parseInt(document.getElementById('cableType').value);
+      const cableTypes = [4, 12, 36, 144];
+
+      const smallCableInput = document.getElementById('smallCable');
+      const smallCable = parseInt(smallCableInput.value);
+
+      if (isNaN(cableType) || isNaN(smallCable)) {
+        document.getElementById('output').innerText = "Please enter valid numeric values.";
+        return;
+      }
+
+      if (!cableTypes.includes(cableType)) {
+        document.getElementById('output').innerText = "This is an invalid cable type.";
+      } else {
+        if (smallCable > cableType) {
+          document.getElementById('output').innerText = "This small optical cable does not exist for the selected cable.";
+        } else {
+          const outDiv = Math.ceil(smallCable / 12);
+          const tubeColor = getColor(outDiv);
+
+          const order = smallCable - ((outDiv - 1) * 12);
+          const smallCableColor = getColor(order);
+
+          const outputText = `
+            Tube Color: ${tubeColor}
+            Tube Number: ${outDiv}
+            Small Cable Color: ${smallCableColor}
+            Small Cable Number: ${order}
+          `;
+          document.getElementById('output').innerText = outputText;
+
+          // Focus on the next input field or submit the form if it's the last input
+          const nextInput = smallCableInput.nextElementSibling;
+          if (nextInput) {
+            nextInput.focus();
+          } else {
+            document.getElementById('submitButton').click();
+          }
+        }
+      }
+
+      // Show output with fade-in animation
+      document.getElementById('output').style.opacity = '1';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Initial focus animation for the first input field
+      const firstInput = document.getElementById('cableType');
+      firstInput.focus();
+      firstInput.select();
+
+      document.getElementById('smallCable').addEventListener('keyup', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault(); // Prevent form submission
+          calculateColor();
+        }
+      });
+
+      document.getElementById('cableType').addEventListener('keyup', function (event) {
+        if (event.key === 'Enter') {
+          document.getElementById('smallCable').focus();
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <div id="calculator">
+    <h3>ايجاد لون ورقم الفرعة والتيوب في كابلات الفايبر</h3>
+    <label for="cableType">Enter the Cable Type as number [4, 12, 36, 144]: </label>
+    <input type="number" id="cableType" required>
+    <br>
+    <label for="smallCable">Enter the number of the Small optical cable: </label>
+    <input type="number" id="smallCable" required>
+    <br>
+    <button id="submitButton" onclick="calculateColor()">Calculate</button>
+    <div id="output"></div>
+    <br>
+    <hr>
+    <div id="madeBy">Made by Abdallah Bourkeba & Osama Sameh</div>
+  </div>
+</body>
+</html>
